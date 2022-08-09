@@ -71,7 +71,8 @@ const ToDos = () => {
     const toDo = { ...todo };
     toDo.description = input.edit;
     toDo.isEditing = false;
-    if (toDo.description === "" || toDo.description.length < 5) return;
+    if (toDo.description.trim() === "" || toDo.description.trim().length < 5)
+      return;
     saveToDo(toDo);
 
     setToDoList(toDoListCopy);
@@ -82,7 +83,7 @@ const ToDos = () => {
   };
   const validate = () => {
     const errors = {};
-    if (input.add === "" || input.add.length < 5)
+    if (input.add.trim() === "" || input.add.trim().length < 5)
       errors.add = "This field needs to have atleast 5 letters!";
     else delete errors.add;
 
@@ -90,13 +91,13 @@ const ToDos = () => {
   };
   const validateProperty = (e) => {
     if (e.target.name === "add") {
-      if (e.target.value === "" || e.target.value.length < 5)
+      if (e.target.value.trim() === "" || e.target.value.trim().length < 5)
         return "This field needs to have atleast 5 letters!";
     }
   };
   const orderBy = _.orderBy(toDoList, [sort.path], [sort.order]);
   const filter = orderBy.filter((todo) =>
-    todo.description.toLowerCase().includes(input.search.toLowerCase())
+    todo.description.toLowerCase().includes(input.search.trim().toLowerCase())
   );
   return (
     <>
