@@ -1,10 +1,11 @@
-import _ from "lodash";
 import React, { useEffect, useState } from "react";
-import { getToDos, saveToDo } from "../services/fakeToDoService";
+import { deleteToDo, getToDos, saveToDo } from "../services/fakeToDoService";
+import { validate, validateProperty } from "../utills/validation";
 import ToDoAdd from "./ToDoAdd";
 import ToDosTable from "./ToDosTable";
 import ToDosSort from "./ToDosSort";
 import ToDosSearchQuery from "./ToDosSearchQuery";
+import _ from "lodash";
 
 const ToDos = () => {
   const [toDoList, setToDoList] = useState([]);
@@ -25,6 +26,8 @@ const ToDos = () => {
   const handleDelete = (todo) => {
     const newList = toDoList.filter((td) => td.id !== todo.id);
     setToDoList(newList);
+
+    deleteToDo(todo.id);
   };
   const handleChange = (e) => {
     const errorsCopy = { ...errors };
@@ -39,7 +42,7 @@ const ToDos = () => {
   const handleAdd = (e) => {
     e.preventDefault();
     const toDoListCopy = [...toDoList];
-    const errors = validate();
+    const errors = validate(input.add);
     setErrors({ ...errors });
     if (errors) return;
 
@@ -62,41 +65,32 @@ const ToDos = () => {
   const handleEdit = (todo) => {
     const toDoListCopy = [...toDoList];
     const index = toDoList.indexOf(todo);
-    toDoListCopy[index].isEditing = !toDoListCopy[index].isEditing;
+    const condition = toDoListCopy.filter((todo) => todo.isEditing);
+    if (condition.length !== 0) return;
+    toDoListCopy[index].isEditing = true;
+
     setToDoList(toDoListCopy);
     setInput({ ...input, edit: todo.description });
   };
   const handleSave = (todo) => {
     const toDoListCopy = [...toDoList];
+    const index = toDoListCopy.indexOf(todo);
     const toDo = { ...todo };
     toDo.description = input.edit;
     toDo.isEditing = false;
+    toDoListCopy.splice(index, 1, toDo);
     if (toDo.description.trim() === "" || toDo.description.trim().length < 5)
       return;
-    saveToDo(toDo);
-
     setToDoList(toDoListCopy);
+    saveToDo(toDo);
   };
   const handleSort = (obj) => {
     setInput({ ...input, search: "" });
     setSort(obj);
   };
-  const validate = () => {
-    const errors = {};
-    if (input.add.trim() === "" || input.add.trim().length < 5)
-      errors.add = "This field needs to have atleast 5 letters!";
-    else delete errors.add;
 
-    return Object.keys(errors).length === 0 ? null : errors;
-  };
-  const validateProperty = (e) => {
-    if (e.target.name === "add") {
-      if (e.target.value.trim() === "" || e.target.value.trim().length < 5)
-        return "This field needs to have atleast 5 letters!";
-    }
-  };
   const orderBy = _.orderBy(toDoList, [sort.path], [sort.order]);
-  const filter = orderBy.filter((todo) =>
+  const filtered = orderBy.filter((todo) =>
     todo.description.toLowerCase().includes(input.search.trim().toLowerCase())
   );
   return (
@@ -120,7 +114,7 @@ const ToDos = () => {
             </div>
           ) : (
             <ToDosTable
-              items={filter}
+              items={filtered}
               value={input.edit}
               onCheck={handleCheck}
               onChange={handleChange}

@@ -34,12 +34,12 @@ export function getToDo(id) {
 export function saveToDo(todo) {
   let toDoInDb = toDos.find((td) => td.id === todo.id) || {};
   toDoInDb.description = todo.description;
-  toDoInDb.dateOfCreation = Date.now();
-  toDoInDb.completed = false;
-  toDoInDb.isEditing = false;
 
   if (!toDoInDb.id) {
     toDoInDb.id = uuid();
+    toDoInDb.dateOfCreation = Date.now();
+    toDoInDb.completed = false;
+    toDoInDb.isEditing = false;
     toDos.push(toDoInDb);
   }
 
