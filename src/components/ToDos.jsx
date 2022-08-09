@@ -23,12 +23,13 @@ const ToDos = () => {
     const toDosList = getToDos();
     setToDoList(toDosList);
   }, []);
+
   const handleDelete = (todo) => {
     const newList = toDoList.filter((td) => td.id !== todo.id);
     setToDoList(newList);
-
     deleteToDo(todo.id);
   };
+
   const handleChange = (e) => {
     const errorsCopy = { ...errors };
     const inputCopy = { ...input };
@@ -39,6 +40,7 @@ const ToDos = () => {
     inputCopy[e.target.name] = e.target.value;
     setInput(inputCopy);
   };
+
   const handleAdd = (e) => {
     e.preventDefault();
     const toDoListCopy = [...toDoList];
@@ -52,16 +54,19 @@ const ToDos = () => {
     setToDoList(toDoListCopy);
     setInput({ ...input, add: "" });
   };
+
   const handleCheck = (item) => {
     const toDoListCopy = [...toDoList];
     const index = toDoList.indexOf(item);
     toDoListCopy[index].completed = !toDoListCopy[index].completed;
     setToDoList(toDoListCopy);
   };
+
   const handleClearChecked = () => {
     const filtered = toDoList.filter((todo) => !todo.completed);
     setToDoList(filtered);
   };
+
   const handleEdit = (todo) => {
     const toDoListCopy = [...toDoList];
     const index = toDoList.indexOf(todo);
@@ -72,6 +77,7 @@ const ToDos = () => {
     setToDoList(toDoListCopy);
     setInput({ ...input, edit: todo.description });
   };
+
   const handleSave = (todo) => {
     const toDoListCopy = [...toDoList];
     const index = toDoListCopy.indexOf(todo);
@@ -84,15 +90,13 @@ const ToDos = () => {
     setToDoList(toDoListCopy);
     saveToDo(toDo);
   };
+
   const handleSort = (obj) => {
     setInput({ ...input, search: "" });
     setSort(obj);
   };
 
-  const orderBy = _.orderBy(toDoList, [sort.path], [sort.order]);
-  const filtered = orderBy.filter((todo) =>
-    todo.description.toLowerCase().includes(input.search.trim().toLowerCase())
-  );
+  const filtered = orderAndFilter(toDoList, sort, input);
   return (
     <>
       <div className="row">
@@ -141,3 +145,10 @@ const ToDos = () => {
 };
 
 export default ToDos;
+function orderAndFilter(toDoList, sort, input) {
+  const orderBy = _.orderBy(toDoList, [sort.path], [sort.order]);
+  const filtered = orderBy.filter((todo) =>
+    todo.description.toLowerCase().includes(input.search.trim().toLowerCase())
+  );
+  return filtered;
+}
