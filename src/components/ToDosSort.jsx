@@ -21,7 +21,9 @@ const ToDosSort = ({ label, sort, onSort }) => {
   ];
   return (
     <>
-      <label htmlFor={label}>{label}</label>
+      <label className="mx-1" htmlFor={label}>
+        {label}
+      </label>
       <DropDownList
         options={options}
         valueProperty="path"
